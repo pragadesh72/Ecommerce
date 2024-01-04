@@ -1,24 +1,16 @@
 import { Row } from "antd";
-import axios from "axios";
-import React, { useEffect, useState } from "react";
 
+import React from "react";
+
+import Header from "./Header";
 import { Tile } from "./Tile";
 
 export const Gridwall = () => {
-  const [products, setProducts] = useState([]);
-
-  console.log(products);
-
-  useEffect(() => {
-    axios.get("https://fakestoreapi.com/products").then(({ data }) => {
-      setProducts(data.slice(0, 9));
-    });
-  }, []);
-
   return (
     <div className="gridwall">
+      <Header />
       <Row>
-        <Tile products={products} />
+        <Tile />
       </Row>
     </div>
   );
