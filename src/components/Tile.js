@@ -3,22 +3,25 @@ import { Typography } from "antd";
 import { Button } from "antd";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import { addToCart } from "../redux/actions/gridwallActions";
 import {
   LikeOutlined,
   DislikeOutlined,
   DislikeFilled,
   LikeFilled,
 } from "@ant-design/icons";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export const Tile = () => {
   const { Title, Paragraph, Text, Link } = Typography;
 
+  const dispatch = useDispatch();
   const [products, setProducts] = useState([]);
-
-  console.log(products);
+  const [cartItems, setCartItems] = useState([]);
 
   useEffect(() => {
-    console.log("useeffect called");
     axios.get("https://fakestoreapi.com/products").then(({ data }) => {
       const products = data.slice(0, 9).map(item => {
         item.like = false;
@@ -38,14 +41,34 @@ export const Tile = () => {
       products[id].dislike = !products[id].dislike;
       products[id].like = false;
     }
-    console.log(products);
     setProducts([...products]);
   };
 
-  const addTocart = () => {
-    console.log("item added to cart");
+  const addTocart = id => {
+    const ExistedItem = cartItems.some(item => item === id);
+    if (ExistedItem) {
+      toast.info("Item Already In Cart !", {
+        position: toast.POSITION.TOP_RIGHT
+      });
+    } else {
+      setCartItems([...cartItems, id]);
+      const cartProduct = products.filter(item => item.id === id);
+      dispatch(addToCart(cartProduct));
+    }
   };
   return (
+    <>
+     <ToastContainer 
+     position="top-right"
+     autoClose={3000}
+     hideProgressBar={false}
+     newestOnTop={false}
+     closeOnClick
+     rtl={false}
+     pauseOnFocusLoss
+     draggable
+     pauseOnHover
+     theme="light"/>
     <Row style={{ padding: "20px" }}>
       {products.map((data, index) => (
         <Col id={data.id} span={8} style={{ height: "500px", padding: "20px" }}>
@@ -90,12 +113,17 @@ export const Tile = () => {
           </div>
 
           <div style={{ marginTop: "15px" }}>
-            <Button className="AddToCart" type="primary" onClick={addTocart}>
+            <Button
+              className="AddToCart"
+              type="primary"
+              onClick={() => addTocart(data.id)}
+            >
               Add To Cart
             </Button>
           </div>
         </Col>
       ))}
     </Row>
+    </>
   );
 };

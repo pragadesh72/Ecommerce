@@ -1,22 +1,23 @@
 import { Row, Col } from "antd";
-import React, { useState } from "react";
+import React from "react";
+import { useSelector } from "react-redux";
 import "../css/Header.css";
 import { ShoppingCartOutlined } from "@ant-design/icons";
 
 export default function Header() {
-  const [cartQty, setCartQty] = useState(0);
+  const cartQty = useSelector(state => state.gw.cartQty);
   return (
-    <Row>
+<>
       <Col
-        className="header perfect-center"
+        className="perfect-center"
         span={4}
         style={{ color: "white" }}
       >
         <h1 style={{ margin: "0" }}>ShopApp</h1>
       </Col>
-      <Col span={16} className="header perfect-center" />
+      <Col span={16} className="perfect-center" />
       <Col
-        className="header perfect-center"
+        className="perfect-center"
         span={4}
         style={{ color: "white", position: "relative" }}
       >
@@ -25,6 +26,8 @@ export default function Header() {
           {cartQty}
         </span>
       </Col>
-    </Row>
+  </>
   );
 }
+
+

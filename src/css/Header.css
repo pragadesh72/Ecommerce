@@ -1,4 +1,7 @@
 .header {
   height : 15vh;
   background: black;
+position: fixed;
+width: 100vw;
+z-index: 10000;
 }
