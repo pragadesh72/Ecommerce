@@ -1,35 +1,48 @@
 import { Col, Row } from "antd";
-import { Typography } from "antd";
 import { Button } from "antd";
+import { Typography } from "antd";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
-import { addToCart } from "../redux/actions/gridwallActions";
+import { useTranslation } from "react-i18next";
+import InfiniteScroll from "react-infinite-scroll-component";
+import { useDispatch, useSelector } from "react-redux";
+import { toast, ToastContainer } from "react-toastify";
+import { addToCart, fetchProducts } from "../redux/actions/gridwallActions";
 import {
   LikeOutlined,
   DislikeOutlined,
   DislikeFilled,
   LikeFilled,
 } from "@ant-design/icons";
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import CircularProgress from "@mui/material/CircularProgress";
+
+import Rating from "@mui/material/Rating";
+import "react-toastify/dist/ReactToastify.css";
 
 export const Tile = () => {
   const { Title, Paragraph, Text, Link } = Typography;
-
+  const { t } = useTranslation();
   const dispatch = useDispatch();
-  const [products, setProducts] = useState([]);
+  const [pos, setPos] = useState({ startPos: 0, endPos: 6 });
+ // const [products, setProducts] = useState([]);
   const [cartItems, setCartItems] = useState([]);
+  const [hasMore, setHasMore] = useState(true);
+  const [loading, setLoader] = useState(true);
+
+  const products = useSelector(state => state.gw.productList);
+  
 
   useEffect(() => {
-    axios.get("https://fakestoreapi.com/products").then(({ data }) => {
-      const products = data.slice(0, 9).map(item => {
-        item.like = false;
-        item.dislike = false;
-        return item;
+    setTimeout(() => {
+      dispatch(fetchProducts(pos));
+      setPos({
+        ...pos,
+        startPos: pos.startPos + 6,
+            endPos: pos.endPos + 6,
       });
-      setProducts(products);
-    });
+      setLoader(false);
+    }, 2000)
+     
   }, []);
 
   const updateLikeandDislike = (id, value) => {
@@ -41,14 +54,14 @@ export const Tile = () => {
       products[id].dislike = !products[id].dislike;
       products[id].like = false;
     }
-    setProducts([...products]);
+    //setProducts([...products]);
   };
 
   const addTocart = id => {
     const ExistedItem = cartItems.some(item => item === id);
     if (ExistedItem) {
-      toast.info("Item Already In Cart !", {
-        position: toast.POSITION.TOP_RIGHT
+      toast.info("Already Existing In Cart !!!", {
+        position: toast.POSITION.TOP_RIGHT,
       });
     } else {
       setCartItems([...cartItems, id]);
@@ -56,74 +69,131 @@ export const Tile = () => {
       dispatch(addToCart(cartProduct));
     }
   };
+
+  const fetchData = () => {
+    // Simulate fetching more data
+    console.log("fetching data");
+    if (products.length < 18) {
+      setTimeout(() => {
+        dispatch(fetchProducts(pos));
+        setPos({
+          ...pos,
+          startPos: pos.startPos + 6,
+              endPos: pos.endPos + 6,
+        });
+      }, 1500); // Simulated delay for API call
+    } else {
+      setHasMore(false);
+      setPos({
+        ...pos,
+        startPos: 0,
+        endPos: 6,
+      });
+    }
+  };
+
   return (
     <>
-     <ToastContainer 
-     position="top-right"
-     autoClose={3000}
-     hideProgressBar={false}
-     newestOnTop={false}
-     closeOnClick
-     rtl={false}
-     pauseOnFocusLoss
-     draggable
-     pauseOnHover
-     theme="light"/>
-    <Row style={{ padding: "20px" }}>
-      {products.map((data, index) => (
-        <Col id={data.id} span={8} style={{ height: "500px", padding: "20px" }}>
-          <div style={{ marginBottom: "10px" }}>
-            <img src={data.image} style={{ height: "200px" }} />
-          </div>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
 
-          <div
-            style={{ fontSize: "14px", textAlign: "start", padding: "10px" }}
-          >
-            <span>
-              <strong style={{ fontSize: "18px" }}>{data.title}</strong>
-            </span>
-            <div style={{ marginTop: "10px" }}>
-              <span>
-                <strong>Price : {data.price}</strong>
-              </span>
-            </div>
-            <div style={{ marginTop: "5px" }}>
-              <span>
-                <strong>Rating : {data.rating.rate}</strong>
-              </span>
-            </div>
-            <div style={{ marginTop: "5px" }}>
-              <span>
-                <strong>Quantity : {data.rating.count}</strong>
-              </span>
-            </div>
-            <div
-              style={{ marginTop: "5px", fontSize: "20px", cursor: "pointer" }}
-            >
-              <span
-                style={{ marginRight: "10px" }}
-                onClick={() => updateLikeandDislike(index, "like")}
+      <InfiniteScroll
+        dataLength={products.length}
+        next={fetchData}
+        hasMore={hasMore}
+        loader={<h1>Loading...</h1>}
+        height={600}
+      >
+        {loading && <CircularProgress style={{ color: "black", position : "absolute", top:"50%" }} />}
+        <Row>
+          {products.map((data, index) => (
+            <Col id={data.id} span={8} style={{ padding: "20px" }}>
+              <div style={{ marginBottom: "10px" }}>
+                <img src={data.image} style={{ height: "200px" }} />
+              </div>
+
+              <div
+                style={{
+                  fontSize: "14px",
+                  textAlign: "start",
+                  padding: "10px",
+                }}
               >
-                {data.like ? <LikeFilled /> : <LikeOutlined />}
-              </span>
-              <span onClick={() => updateLikeandDislike(index, "dislike")}>
-                {data.dislike ? <DislikeFilled /> : <DislikeOutlined />}
-              </span>
-            </div>
-          </div>
+                <span>
+                  <strong style={{ fontSize: "18px" }}>{data.title}</strong>
+                </span>
+                <div style={{ marginTop: "10px" }}>
+                  <span>
+                    <strong>
+                      {t("Price")} : {data.price}
+                    </strong>
+                  </span>
+                </div>
+                <div style={{ marginTop: "5px" }}>
+                  <span>
+                    <strong>
+                      {t("Rating")} :
+                      <Rating
+                        style={{ fontSize: "20px", position: "absolute" }}
+                        name="half-rating-read"
+                        defaultValue={0}
+                        value={data.rating.rate}
+                        precision={0.1}
+                        readOnly
+                      />
+                    </strong>
+                  </span>
+                </div>
+                <div style={{ marginTop: "5px" }}>
+                  <span>
+                    <strong>
+                      {" "}
+                      {t("Quantity")} : {data.rating.count}
+                    </strong>
+                  </span>
+                </div>
+                <div
+                  style={{
+                    marginTop: "5px",
+                    fontSize: "20px",
+                    cursor: "pointer",
+                  }}
+                >
+                  <span
+                    style={{ marginRight: "10px" }}
+                    onClick={() => updateLikeandDislike(index, "like")}
+                  >
+                    {data.like ? <LikeFilled /> : <LikeOutlined />}
+                  </span>
+                  <span onClick={() => updateLikeandDislike(index, "dislike")}>
+                    {data.dislike ? <DislikeFilled /> : <DislikeOutlined />}
+                  </span>
+                </div>
+              </div>
 
-          <div style={{ marginTop: "15px" }}>
-            <Button
-              className="AddToCart"
-              type="primary"
-              onClick={() => addTocart(data.id)}
-            >
-              Add To Cart
-            </Button>
-          </div>
-        </Col>
-      ))}
-    </Row>
+              <div style={{ marginTop: "15px" }}>
+                <Button
+                  className="AddToCart"
+                  type="primary"
+                  onClick={() => addTocart(data.id)}
+                >
+                  {t("AddToCart")}
+                </Button>
+              </div>
+            </Col>
+          ))}
+        </Row>
+      </InfiniteScroll>
     </>
   );
 };

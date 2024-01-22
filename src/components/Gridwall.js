@@ -12,7 +12,7 @@ export const Gridwall = () => {
         <Header />
       </Row>
 
-      <Row style={{ position: "relative", top: "100px" }}>
+      <Row className="tile">
         <Tile />
       </Row>
     </div>

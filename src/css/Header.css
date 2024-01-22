@@ -1,7 +1,28 @@
 .header {
   height : 15vh;
   background: black;
-position: fixed;
 width: 100vw;
-z-index: 10000;
+color : white;
+}
+
+.one .css-yf8vq0-MuiSelect-nativeInput {
+  /* background: white; */
+  bottom: 0;
+  left: 0;
+  position: absolute;
+  opacity: 1;
+  pointer-events: none;
+  width: 100%;
+  box-sizing: border-box;
+  background: black;
+  border: none;
+  color : whitesmoke;
+  font-size:25px;
+}
+
+ .MuiSelect-iconStandard {
+  background: white;
+  position: relative;
+  top:10px;
+  height:10px;
 }

@@ -3,6 +3,7 @@
   width : 100vw;
   height: 100vh;
   text-align: center;
+  overflow: hidden;
 }
 
 .Landing > div {
@@ -55,3 +56,9 @@
   cursor: pointer;
   background-color: black!important;
 }
+
+.tile, .infinite-scroll-component__outerdiv {
+  width:100vw;
+}
+
+
