@@ -57,8 +57,20 @@
   background-color: black!important;
 }
 
-.tile, .infinite-scroll-component__outerdiv {
-  width:100vw;
+.sidebar {
+  width:15vw;
+  background-color: black;
+  color : white;
 }
+.sidebar span {
+  color:white;
+}
+.tile, .infinite-scroll-component__outerdiv {
+  width:85vw;
+}
+.tile:hover {
+  cursor: pointer;
+}
+
 
 

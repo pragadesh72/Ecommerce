@@ -7,6 +7,8 @@ import "./App.css";
 import { Cart } from "./components/Cart";
 import { Gridwall } from "./components/Gridwall";
 import { Landing } from "./components/Landing";
+import Login from "./components/Login";
+import Register from "./components/Register";
 import reducers from "./redux/reducers/index";
 
 function App() {
@@ -16,6 +18,8 @@ function App() {
       <Provider store={store}>
         <Routes>
           <Route path="/" element={<Landing />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/login" element={<Login />} />
           <Route path="/gridwall" element={<Gridwall />} />
           <Route path="/cart" element={<Cart />} />
         </Routes>

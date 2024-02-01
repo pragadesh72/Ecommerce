@@ -6,7 +6,7 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { useDispatch, useSelector } from "react-redux";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import { addToCart, fetchProducts } from "../redux/actions/gridwallActions";
 import {
   LikeOutlined,
@@ -18,6 +18,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 
 import Rating from "@mui/material/Rating";
 import "react-toastify/dist/ReactToastify.css";
+import { ToastMessage } from "../common/ToastMessage";
 
 export const Tile = () => {
   const { Title, Paragraph, Text, Link } = Typography;
@@ -29,7 +30,8 @@ export const Tile = () => {
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoader] = useState(true);
 
-  const products = useSelector(state => state.gw.productList);
+  const products = useSelector(state =>  state.gw.productList);
+ 
   
 
   useEffect(() => {
@@ -46,7 +48,7 @@ export const Tile = () => {
   }, []);
 
   const updateLikeandDislike = (id, value) => {
-    console.log("clicked", id);
+    
     if (value == "like") {
       products[id].like = !products[id].like;
       products[id].dislike = false;
@@ -72,7 +74,7 @@ export const Tile = () => {
 
   const fetchData = () => {
     // Simulate fetching more data
-    console.log("fetching data");
+    
     if (products.length < 18) {
       setTimeout(() => {
         dispatch(fetchProducts(pos));
@@ -94,18 +96,7 @@ export const Tile = () => {
 
   return (
     <>
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-      />
+      <ToastMessage/>
 
       <InfiniteScroll
         dataLength={products.length}
@@ -119,7 +110,7 @@ export const Tile = () => {
           {products.map((data, index) => (
             <Col id={data.id} span={8} style={{ padding: "20px" }}>
               <div style={{ marginBottom: "10px" }}>
-                <img src={data.image} style={{ height: "200px" }} />
+                <img src={data.images[0]} style={{ height: "200px", width: "300px" }} />
               </div>
 
               <div
@@ -147,7 +138,7 @@ export const Tile = () => {
                         style={{ fontSize: "20px", position: "absolute" }}
                         name="half-rating-read"
                         defaultValue={0}
-                        value={data.rating.rate}
+                        value={data.rating}
                         precision={0.1}
                         readOnly
                       />
@@ -158,7 +149,7 @@ export const Tile = () => {
                   <span>
                     <strong>
                       {" "}
-                      {t("Quantity")} : {data.rating.count}
+                      {t("Quantity")} : {data.stock}
                     </strong>
                   </span>
                 </div>

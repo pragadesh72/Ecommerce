@@ -1,6 +1,6 @@
 import { Row, Col } from "antd";
 import React, {useState, useRef} from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import "../css/Header.css";
 import { ShoppingCartOutlined, SearchOutlined } from "@ant-design/icons";
 import { useTranslation } from 'react-i18next';
@@ -10,17 +10,23 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import { useNavigate } from 'react-router-dom';
-
+import { filterProductsOnSearch } from "../redux/actions/gridwallActions";
+import { ToastMessage } from "../common/ToastMessage";
+import { toast } from "react-toastify";
+import {flag} from "../common/icon/Icons";
 
 export default function Header() {
   const cartQty = useSelector(state => state.gw.cartQty);
   const[language, setLanguage] = useState("English");
-  const[searchValue, setSearchValue] = useState("")
+  const[searchValue, setSearchValue] = useState("");
+  const dispatch = useDispatch();
   const { i18n } = useTranslation();
   const navigate = useNavigate();
   const InputRef = useRef();
 
-  const products = useSelector(state => state.gw.productList);
+ 
+  const products = useSelector(state =>  state.gw.productList);
+  const AllProducts = useSelector(state =>  state.gw.originalList);
 
   const changeLanguage = (e) => {
     i18n.changeLanguage(e.target.value);
@@ -30,13 +36,13 @@ export default function Header() {
   };
 
   const searchFilter = () => {
-    console.log("search filter");
+   
+  if(searchValue) {
     const regexPattern = new RegExp(searchValue, 'i');
-    //const regexPattern3 = /Hello/i;
-    //const isMatch = regexPattern.test(myString);
-
-    let filtered = products.filter((item) => regexPattern.test(item.title));
-    console.log(filtered)
+    let filteredProducts = AllProducts.filter((item) => regexPattern.test(item.title));
+    dispatch(filterProductsOnSearch(filteredProducts))
+  }  
+  
   }
 
   const gotoCart = () => {
@@ -44,11 +50,13 @@ export default function Header() {
   }
   return (
 <>
+
       <Col
         className="perfect-center"
         span={4}
         style={{ color: "white" }}
       >
+      <ToastMessage/>
         <h1 style={{ margin: "0" }}>ShopApp</h1>
       </Col>
       <Col span={2} className="perfect-center" />
@@ -72,11 +80,13 @@ export default function Header() {
        onClick={() => searchFilter()}
        />
       </Col>
-      <Col span={2} className="perfect-center" />
+      {/* <Col span={2} className="perfect-center" /> */}
       
       <Col span={2} className="perfect-center">
       <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }} style={{display: "flex"}}>
-        <InputLabel style={{color : "white", fontWeight: "bold"}} id="demo-simple-select-standard-label">Language</InputLabel>
+        <InputLabel style={{color : "white", fontWeight: "bold"}} id="demo-simple-select-standard-label">
+        Language
+        </InputLabel>
         <Select
           labelId="demo-simple-select-standard-label"
           id="demo-simple-select-standard"
@@ -85,9 +95,6 @@ export default function Header() {
           onChange={changeLanguage}
           className="one"
         >
-          <MenuItem value="None">
-            <em>None</em>
-          </MenuItem>
           <MenuItem value="en">English</MenuItem>
           <MenuItem value="fr">French</MenuItem>
         </Select>
